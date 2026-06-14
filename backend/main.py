@@ -49,3 +49,4 @@ async def analyze_contract(data: AnalyzeRequest):
         "security_flags": llm_result.get("security_flags", []),
         "risk_score": llm_result.get("risk_score", 50)
     }
+#Avishkar kumar

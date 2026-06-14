@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import "./App.css";
 
-const API_BASE = import.meta.env.VITE_API_URL || "https://chainscope-ai-mantle.onrender.com";
+const API_BASE = import.meta.env.VITE_API_URL || "https://chainscope-ai-mantle-pz7n.onrender.com";
 
 // ── MagicBento ParticleCard logic (pure JS, no GSAP needed) ──
 function MagicCard({ children, className, glowColor = "0, 210, 140" }) {
