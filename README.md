@@ -13,7 +13,7 @@ AI-powered smart contract analysis for Mantle Network. Paste any Mantle contract
 
 | Service | URL |
 |---------|-----|
-| Frontend | https://chainscope-ai-mantle.vercel.app |
+| Frontend | https://chainscope-ai-mantle-lake.vercel.app/ |
 | Backend API | https://chainscope-ai-mantle.onrender.com |
 
 ---
