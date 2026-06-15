@@ -9,21 +9,34 @@ AI-powered smart contract analysis for Mantle Network. Paste any Mantle contract
 
 ---
 
-## Deployed Contracts
+## Live Demo
+
+| Service | URL |
+|---------|-----|
+| Frontend | https://chainscope-ai-mantle.vercel.app |
+| Backend API | https://chainscope-ai-mantle.onrender.com |
+
+---
+
+## Deployed Contract
 
 **Mantle Sepolia Testnet**
 
 | Contract | Address | Description |
 |----------|---------|-------------|
-| Primary | `0x6758D4228f51EAcC011Bb986fccc1816838eb338` | Main deployed contract |
-| Secondary | `0xb8dB8c1Bdb202B990c70732f1aa1653Cd929978B` | Secondary contract |
+| AuditRecord | `0xd045a4bc4f55b2b7c6d734163ffe28ca2c71cb3c` | Audit hash storage on Mantle Sepolia Testnet |
 
-## Live Endpoints
+---
 
-| Service | URL |
-|---------|-----|
-| Frontend | https://chainscope-ai-mantle-lake.vercel.app |
-| Backend API | https://chainscope-ai-mantle-pz7n.onrender.com |
+## What It Does
+
+ChainScope AI takes any Mantle smart contract address and generates a complete audit report:
+
+- **Transaction Summary** — Plain-English explanation of what the contract does
+- **Gas Intelligence** — Average gas usage and specific optimization tips based on actual code
+- **Security Flags** — LLM-powered vulnerability detection with HIGH/MEDIUM/LOW severity ranking
+- **Risk Score** — 0-100 score indicating overall contract safety
+- **On-chain Verifiability** — Audit hash permanently stored on Mantle Testnet
 
 ---
 
@@ -34,19 +47,18 @@ chainscope-ai-mantle
 ├── frontend/                # React + Vite frontend
 │   ├── src/
 │   │   ├── main.jsx        # App entry
-│   │   ├── App.jsx         # Main UI with MagicBento cards
+│   │   ├── App.jsx         # Main UI
 │   │   └── App.css         # Styling
 │   ├── package.json
-│   ├── vite.config.js      # Dev proxy to localhost:8000
-│   └── .env.example        # VITE_API_URL template
+│   └── vite.config.js
 │
 ├── backend/                 # FastAPI backend
-│   ├── main.py             # App entry, / and /analyze routes
-│   ├── mantle_fetch.py     # Mantle Sepolia explorer API client
+│   ├── main.py             # API routes (/analyze)
+│   ├── mantle_fetch.py     # Mantle Sepolia explorer client
 │   ├── llm_analyzer.py     # Groq LLM analysis (Llama 3.3 70B)
-│   └── requirements.txt    # Python deps
+│   └── requirements.txt
 │
-└── contracts/               # Solidity contracts (reserved)
+└── contracts/               # Solidity smart contracts
 ```
 
 ### Data Flow
@@ -80,8 +92,9 @@ User Input (contract address)
 |-------|-----------|
 | Frontend | React 18 + Vite 5 + CSS |
 | Backend | FastAPI + Python 3.10+ |
-| Data Source | Mantle Sepolia Explorer (Blocks) |
+| Data Source | Mantle Sepolia Explorer API (Blockscout) |
 | LLM / Analysis | Groq API — Llama 3.3 70B Versatile |
+| Blockchain | Solidity, Mantle Sepolia Testnet |
 | Deployment | Vercel (frontend) + Render (backend) |
 
 ---
@@ -93,7 +106,7 @@ User Input (contract address)
 ```bash
 cd backend
 
-# Create a virtual environment
+# Create virtual environment
 python -m venv venv
 source venv/bin/activate   # Windows: venv\Scripts\activate
 
@@ -101,14 +114,15 @@ source venv/bin/activate   # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 
 # Configure environment
-cp .env.example .env       # or create manually
-# Required: GROQ_API_KEY=<your_groq_api_key>
+# Create backend/.env with:
+# GROQ_API_KEY=<your_groq_api_key>
 
-# Start the server
+# Start server
 uvicorn main:app --reload
 ```
 
-Backend runs at `http://localhost:8000`. API docs available at `http://localhost:8000/docs`.
+Backend runs at `http://localhost:8000`
+API docs at `http://localhost:8000/docs`
 
 ### 2. Frontend
 
@@ -117,13 +131,13 @@ cd frontend
 
 npm install
 
-cp .env.example .env.local
-# Set VITE_API_URL=http://localhost:8000
+# Create frontend/.env.local with:
+# VITE_API_URL=http://localhost:8000
 
 npm run dev
 ```
 
-Frontend runs at `http://localhost:5173` with API proxy to localhost:8000.
+Frontend runs at `http://localhost:5173`
 
 ---
 
@@ -146,95 +160,53 @@ Frontend runs at `http://localhost:5173` with API proxy to localhost:8000.
 ## API Reference
 
 ### `GET /`
+Health check.
 
-Health check endpoint.
-
-**Response:**
 ```json
-{
-  "message": "ChainScope AI Backend Running"
-}
+{ "message": "ChainScope AI Backend Running" }
 ```
 
 ### `POST /analyze`
 
-Analyze a smart contract address.
-
-**Request Body:**
+**Request:**
 ```json
-{
-  "contract_address": "0x6758D4228f51EAcC011Bb986fccc1816838eb338"
-}
+{ "contract_address": "0xd045a4bc4f55b2b7c6d734163ffe28ca2c71cb3c" }
 ```
 
 **Response:**
 ```json
 {
   "success": true,
-  "contract_address": "0x6758D4228f51EAcC011Bb986fccc1816838eb338",
+  "contract_address": "0xd045a4bc4f55b2b7c6d734163ffe28ca2c71cb3c",
   "is_verified": true,
-  "contract_name": "SampleVerifiedContract",
-  "source_code": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\n...",
+  "contract_name": "AuditRecord",
   "summary": {
-    "contract_type": "ERC20 Token",
-    "description": "A standard ERC20 token contract with minting and burning functionality."
+    "contract_type": "Custom",
+    "description": "This contract stores audit hashes on-chain for verifiability."
   },
   "gas_insights": {
     "average_gas": 45000,
-    "optimization_tip": "Consider using unchecked blocks for arithmetic operations in Solidity 0.8+."
+    "optimization_tip": "Consider using events instead of storage for audit logs to save gas."
   },
   "security_flags": [
-    {
-      "severity": "Medium",
-      "issue": "Reentrancy risk in withdraw function — consider Checks-Effects-Interactions pattern."
-    }
+    { "severity": "Low", "issue": "No access control on storeAudit — anyone can write." }
   ],
-  "risk_score": 42
+  "risk_score": 25
 }
 ```
 
-**Fields:**
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `success` | boolean | Request success status |
-| `contract_address` | string | Quoted contract address |
-| `is_verified` | boolean | Whether source code is verified on explorer |
-| `contract_name` | string | Contract name from explorer |
-| `source_code` | string | Full verified source code (truncated if >5KB) |
-| `summary.contract_type` | string | Category: ERC20 / ERC721 / Vault / Marketplace / Custom |
-| `summary.description` | string | Plain-English description of contract purpose |
-| `gas_insights.average_gas` | number | Average gas used across recent transactions |
-| `gas_insights.optimization_tip` | string | Specific gas optimization suggestion |
-| `security_flags` | array | List of detected security issues with severity |
-| `risk_score` | integer | 0 (very safe) to 100 (very risky) |
-
 ---
 
-## Feature Cards
+## Hackathon
 
-- **Transaction Summary** — Every interaction decoded into plain English. Volume, frequency, patterns — laid bare without jargon.
-- **Gas Intelligence** — Understand exactly where gas burns. Optimization tips grounded in your contract's actual behaviour.
-- **Security Flags** — RAG-powered vulnerability detection against a curated Solidity security knowledge base. Risk, ranked.
-- **On-chain Verifiability** — Audit summary anchored on Mantle Testnet. Your report, permanently verifiable on-chain.
+Built for **Mantle Turing Test Hackathon 2026** — Track: AI DevTools
 
----
+**Team**: 4-member team combining AI/ML engineering, full-stack development, and Web3 basics.
 
-## MCPs & Integrations
-
-| Service | Purpose |
-|---------|---------|
-| Mantle Sepolia Explorer | Fetches verified source code, ABI, balance, transactions |
-| Groq API | LLM inference for structured contract analysis |
-
----
-
-## Contributing
-
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+**X**: [@AVISHKARKU71986](https://x.com/AVISHKARKU71986)
 
 ---
 
 ## License
 
-MIT — Built with care for the Mantle ecosystem · Hackathon 2026
+MIT — Built for the Mantle ecosystem · 2026
